@@ -1,4 +1,6 @@
+
 <!DOCTYPE html>
+{% load custom_filters %}
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -14,55 +16,72 @@
 
     <style>
         .form-control{
-        padding: 1.375rem .75rem !important;
-    }
+            padding: 1.375rem .75rem !important;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h3 class="pt-5 text-center">Django ToDo App</h3>
+        <h3 class="pt-5 text-center">Django ToDo App by @Sadle</h3>
         <div class="row">
             <h4>My Day</h4>
             <p class="text-muted">{% now "j F Y" %}</p>
             <div class="col-md-7 col-lg-7" style="height: 450px; overflow: scroll;">
                 <!-- List of all the tasks for the day -->
+
                 {% for task in tasks %}
-                <div class="card m-1">
-                    <div class="card-body">
-                        {{task.task}}
-                        <span style="position: relative; float: right;">
-                            <a class="btn btn-success"><i class="fa fa-check"></i> Mark as Done</a>
-                            <a class="btn btn-danger"><i class="fa fa-trash"></i></a>
-                            <a class="btn btn-primary"><i class="fa fa-pencil"></i></a>
-                        </span>
+                    <div class="card m-1">
+                        <div class="card-body">
+                            {{task.task}}
+                            <span style="position: relative; float: right;">
+                                <a href="{% url 'task_as_done' task.id %} " class="btn btn-success"><i class="fa fa-check"></i> Mark as Done</a>
+                                <a class="btn btn-danger"><i class="fa fa-trash"></i></a>
+                                <a href="{% url 'edit_task' task.id %}" class="btn btn-primary"><i class="fa fa-pencil"></i></a>
+                            </span>
+                        </div>
                     </div>
-                </div>
                 {% endfor %}
+
             </div>
             <div class="col-md-5 col-lg-5">
                 <h5>Completed Tasks</h5>
                 <!-- List of all the tasks that have completed -->
+                {% for completed_task in completed_tasks %}
                 <div class="card m-1">
                     <div class="card-body">
-                        This is the completed task.
+                        <strong class="text-success">{{completed_task.task|capitalize_first_letter}}</strong>
+                        <span style="position: relative; float: right;" > <a href="{% url 'mark_as_incomplete' completed_task.id %}" class="btn btn-danger"><i class="bi bi-x"></i> Mark as incomplete</a></span>
                     </div>
                 </div>
+                {% endfor %}
             </div>
         </div>
         <div class="row">
             <div class="col-md-6 col-lg-6 p-0" style="position: absolute; bottom: 50px;">
                 <!-- To Do Form -->
-                <form action="{% url 'addtask' %}" method="POST">
+                <form id="myForm" action="{% url 'addtask' %}" method="POST">
                     {% csrf_token %}
                     <div class="form-group">
                         <span style="display: flex;">
-                            <input type="text" name="task" class="form-control" placeholder="Add a task">
-                            <button type="submit"  class="btn btn-primary" style="width: 200px;"><i class="fa fa-plus"></i> Add</button>
+                            <input type="text" id="task" name="task" class="form-control" placeholder="Add a task">
+                            <button id="button_submit" type="submit"  class="btn btn-primary" style="width: 200px;"><i class="fa fa-plus"></i> Add</button>
                         </span>
                     </div>
                 </form>
             </div>
         </div>
     </div>
+     <script>
+
+        document.getElementById('button_submit').addEventListener('click', function() {
+            var task = document.getElementById('task').value;
+
+            if (task.trim() === '') {
+                alert('the task must be given.');
+            } else {
+                document.getElementById('myForm').submit();
+            }
+        });
+    </script>
 </body>
 </html>
